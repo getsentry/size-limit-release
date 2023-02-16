@@ -55,8 +55,10 @@ async function run() {
     const body = [
       release.data.body,
       SIZE_LIMIT_HEADING,
-      markdownTable(limit.formatResults(undefined, sizeLimitResults)),
-    ].join("\r\n");
+      // Note: The size limit result table will add (added) to each result, because we do not compare against anything
+      // We just remove these entries, as we don't care about them.
+      markdownTable(limit.formatResults(undefined, sizeLimitResults)).replace(/ (added)/gmi, ''),
+    ].join("\r\n\r\n");
 
     await octokit.rest.repos.updateRelease({
       ...repo,
