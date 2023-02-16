@@ -12724,7 +12724,7 @@ async function run() {
       SIZE_LIMIT_HEADING,
       // Note: The size limit result table will add (added) to each result, because we do not compare against anything
       // We just remove these entries, as we don't care about them.
-      _markdowntable.markdownTable.call(void 0, limit.formatResults(undefined, sizeLimitResults)).replace(/ (added)/gmi, ''),
+      _markdowntable.markdownTable.call(void 0, limit.formatResults(undefined, sizeLimitResults)).replace(/ \(added\)/gmi, ''),
     ].join("\r\n\r\n");
 
     await octokit.rest.repos.updateRelease({
