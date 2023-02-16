@@ -1,0 +1,19 @@
+name: "size-limit-release"
+description: "Add size limit information to a Github release."
+author: "Francesco Novy <francesco.novy@sentry.io>"
+branding:
+  icon: "activity"
+  color: "green"
+inputs:
+  github_token:
+    required: true
+    description: "a github access token"
+  version:
+    required: true
+    description: "The version that should have size info added."
+  workflow_name:
+    required: true
+    description: The name of the workflow where the size limit info is stored
+runs:
+  using: "node16"
+  main: "src/index.js"
