@@ -13,7 +13,10 @@ inputs:
     description: "The version that should have size info added."
   workflow_name:
     required: true
-    description: The name of the workflow where the size limit info is stored
+    description: "The name of the workflow where the size limit info is stored."
+  branch_name:
+    required: false
+    description: Optionally, define a branch to fetch size limit info from. Defaults to `release/VERSION`.
 runs:
   using: "node16"
   main: "src/index.js"

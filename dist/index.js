@@ -12689,8 +12689,7 @@ async function run() {
     const version = getInput("version");
     const githubToken = getInput("github_token");
     const workflowName = getInput("workflow_name");
-
-    const branchName = `release/${version}`;
+    const branchName = getInput("branch_name") || `release/${version}`;
 
     const octokit = _github.getOctokit.call(void 0, githubToken);
 
