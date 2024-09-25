@@ -39,6 +39,8 @@ async function run() {
       return;
     }
 
+    core.debug(`Fetching artifacts for branch=${branchName} and workflow=${workflowName}`);
+
     const artifacts = await getArtifactsForBranchAndWorkflow(octokit, {
       ...repo,
       artifactName: ARTIFACT_NAME,

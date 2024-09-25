@@ -78,6 +78,8 @@ const DEFAULT_PAGE_LIMIT = 10;
   let currentPage = 0;
   let latestWorkflowRun = null;
 
+  core.info(`Fetching workflow runs for parameters: owner=${owner}, repo=${repo}, workflow_id=${workflow_id}, branch=${branch}`);
+
   for await (const response of octokit.paginate.iterator(
     octokit.rest.actions.listWorkflowRuns,
     {
@@ -129,6 +131,8 @@ const DEFAULT_PAGE_LIMIT = 10;
         repo,
         run_id: workflowRun.id,
       });
+
+      core.info(`Found ${artifacts.length} artifacts for workflow run: ${artifacts.map(({ name }) => name).join(", ")}`);
 
       if (!artifacts) {
         core.warning(
