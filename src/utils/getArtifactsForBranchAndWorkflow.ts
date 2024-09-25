@@ -4,7 +4,7 @@ import { getOctokit } from "@actions/github";
 // max pages of workflows to pagination through
 const DEFAULT_MAX_PAGES = 50;
 // max results per page
-const DEFAULT_PAGE_LIMIT = 10;
+const DEFAULT_PAGE_LIMIT = 100;
 
 /**
  * Fetch artifacts from a workflow run from a branch
@@ -47,6 +47,7 @@ export async function getArtifactsForBranchAndWorkflow(
     {
       owner,
       repo,
+      per_page: 100,
     }
   )) {
     const data = response.data as { name: string; id: number }[];
@@ -78,7 +79,9 @@ export async function getArtifactsForBranchAndWorkflow(
   let currentPage = 0;
   let latestWorkflowRun = null;
 
-  core.info(`Fetching workflow runs for parameters: owner=${owner}, repo=${repo}, workflow_id=${workflow_id}, branch=${branch}`);
+  core.info(
+    `Fetching workflow runs for parameters: owner=${owner}, repo=${repo}, workflow_id=${workflow_id}, branch=${branch}`
+  );
 
   for await (const response of octokit.paginate.iterator(
     octokit.rest.actions.listWorkflowRuns,
@@ -130,11 +133,10 @@ export async function getArtifactsForBranchAndWorkflow(
         owner,
         repo,
         run_id: workflowRun.id,
+        per_page: DEFAULT_PAGE_LIMIT,
       });
 
-      core.info(`Found ${artifacts.length} artifacts for workflow run: ${artifacts.map(({ name }) => name).join(", ")}`);
-
-      if (!artifacts) {
+      if (!artifacts || !artifacts.length) {
         core.warning(
           `Unable to fetch artifacts for branch: ${branch}, workflow: ${workflow_id}, workflowRunId: ${workflowRun.id}`
         );

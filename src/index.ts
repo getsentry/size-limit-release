@@ -16,8 +16,6 @@ const RESULTS_FILE = "size-limit-results.json";
 async function run() {
   const { getInput, setFailed } = core;
 
-  core.info('GET ME THE STUFF!')
-
   try {
     const { repo } = context;
 
@@ -41,7 +39,9 @@ async function run() {
       return;
     }
 
-    core.debug(`Fetching artifacts for branch=${branchName} and workflow=${workflowName}`);
+    core.debug(
+      `Fetching artifacts for branch=${branchName} and workflow=${workflowName}`
+    );
 
     const artifacts = await getArtifactsForBranchAndWorkflow(octokit, {
       ...repo,
@@ -49,6 +49,11 @@ async function run() {
       branch: branchName,
       workflowName,
     });
+
+    if (!artifacts) {
+      core.debug("No artifacts found, skipping...");
+      return;
+    }
 
     await downloadOtherWorkflowArtifact(octokit, {
       ...repo,

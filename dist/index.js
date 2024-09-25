@@ -1163,12 +1163,12 @@ var require_lib = __commonJS({
             throw new Error("Client has already been disposed.");
           }
           const parsedUrl = new URL(requestUrl);
-          let info3 = this._prepareRequest(verb, parsedUrl, headers);
+          let info2 = this._prepareRequest(verb, parsedUrl, headers);
           const maxTries = this._allowRetries && RetryableHttpVerbs.includes(verb) ? this._maxRetries + 1 : 1;
           let numTries = 0;
           let response;
           do {
-            response = yield this.requestRaw(info3, data);
+            response = yield this.requestRaw(info2, data);
             if (response && response.message && response.message.statusCode === HttpCodes.Unauthorized) {
               let authenticationHandler;
               for (const handler of this.handlers) {
@@ -1178,7 +1178,7 @@ var require_lib = __commonJS({
                 }
               }
               if (authenticationHandler) {
-                return authenticationHandler.handleAuthentication(this, info3, data);
+                return authenticationHandler.handleAuthentication(this, info2, data);
               } else {
                 return response;
               }
@@ -1201,8 +1201,8 @@ var require_lib = __commonJS({
                   }
                 }
               }
-              info3 = this._prepareRequest(verb, parsedRedirectUrl, headers);
-              response = yield this.requestRaw(info3, data);
+              info2 = this._prepareRequest(verb, parsedRedirectUrl, headers);
+              response = yield this.requestRaw(info2, data);
               redirectsRemaining--;
             }
             if (!response.message.statusCode || !HttpResponseRetryCodes.includes(response.message.statusCode)) {
@@ -1231,7 +1231,7 @@ var require_lib = __commonJS({
        * @param info
        * @param data
        */
-      requestRaw(info3, data) {
+      requestRaw(info2, data) {
         return __awaiter(this, void 0, void 0, function* () {
           return new Promise((resolve, reject) => {
             function callbackForResult(err, res) {
@@ -1243,7 +1243,7 @@ var require_lib = __commonJS({
                 resolve(res);
               }
             }
-            this.requestRawWithCallback(info3, data, callbackForResult);
+            this.requestRawWithCallback(info2, data, callbackForResult);
           });
         });
       }
@@ -1253,12 +1253,12 @@ var require_lib = __commonJS({
        * @param data
        * @param onResult
        */
-      requestRawWithCallback(info3, data, onResult) {
+      requestRawWithCallback(info2, data, onResult) {
         if (typeof data === "string") {
-          if (!info3.options.headers) {
-            info3.options.headers = {};
+          if (!info2.options.headers) {
+            info2.options.headers = {};
           }
-          info3.options.headers["Content-Length"] = Buffer.byteLength(data, "utf8");
+          info2.options.headers["Content-Length"] = Buffer.byteLength(data, "utf8");
         }
         let callbackCalled = false;
         function handleResult(err, res) {
@@ -1267,7 +1267,7 @@ var require_lib = __commonJS({
             onResult(err, res);
           }
         }
-        const req = info3.httpModule.request(info3.options, (msg) => {
+        const req = info2.httpModule.request(info2.options, (msg) => {
           const res = new HttpClientResponse(msg);
           handleResult(void 0, res);
         });
@@ -1279,7 +1279,7 @@ var require_lib = __commonJS({
           if (socket) {
             socket.end();
           }
-          handleResult(new Error(`Request timeout: ${info3.options.path}`));
+          handleResult(new Error(`Request timeout: ${info2.options.path}`));
         });
         req.on("error", function(err) {
           handleResult(err);
@@ -1306,27 +1306,27 @@ var require_lib = __commonJS({
         return this._getAgent(parsedUrl);
       }
       _prepareRequest(method, requestUrl, headers) {
-        const info3 = {};
-        info3.parsedUrl = requestUrl;
-        const usingSsl = info3.parsedUrl.protocol === "https:";
-        info3.httpModule = usingSsl ? https2 : http2;
+        const info2 = {};
+        info2.parsedUrl = requestUrl;
+        const usingSsl = info2.parsedUrl.protocol === "https:";
+        info2.httpModule = usingSsl ? https2 : http2;
         const defaultPort = usingSsl ? 443 : 80;
-        info3.options = {};
-        info3.options.host = info3.parsedUrl.hostname;
-        info3.options.port = info3.parsedUrl.port ? parseInt(info3.parsedUrl.port) : defaultPort;
-        info3.options.path = (info3.parsedUrl.pathname || "") + (info3.parsedUrl.search || "");
-        info3.options.method = method;
-        info3.options.headers = this._mergeHeaders(headers);
+        info2.options = {};
+        info2.options.host = info2.parsedUrl.hostname;
+        info2.options.port = info2.parsedUrl.port ? parseInt(info2.parsedUrl.port) : defaultPort;
+        info2.options.path = (info2.parsedUrl.pathname || "") + (info2.parsedUrl.search || "");
+        info2.options.method = method;
+        info2.options.headers = this._mergeHeaders(headers);
         if (this.userAgent != null) {
-          info3.options.headers["user-agent"] = this.userAgent;
+          info2.options.headers["user-agent"] = this.userAgent;
         }
-        info3.options.agent = this._getAgent(info3.parsedUrl);
+        info2.options.agent = this._getAgent(info2.parsedUrl);
         if (this.handlers) {
           for (const handler of this.handlers) {
-            handler.prepareRequest(info3.options);
+            handler.prepareRequest(info2.options);
           }
         }
-        return info3;
+        return info2;
       }
       _mergeHeaders(headers) {
         if (this.requestOptions && this.requestOptions.headers) {
@@ -2160,10 +2160,10 @@ Support boolean input list: \`true | True | TRUE | false | False | FALSE\``);
       command_1.issueCommand("notice", utils_1.toCommandProperties(properties), message instanceof Error ? message.toString() : message);
     }
     exports2.notice = notice;
-    function info3(message) {
+    function info2(message) {
       process.stdout.write(message + os.EOL);
     }
-    exports2.info = info3;
+    exports2.info = info2;
     function startGroup(name) {
       command_1.issue("group", name);
     }
@@ -10367,7 +10367,7 @@ var SizeLimit_default = SizeLimit;
 // src/utils/getArtifactsForBranchAndWorkflow.ts
 var core = __toESM(require_core());
 var DEFAULT_MAX_PAGES = 50;
-var DEFAULT_PAGE_LIMIT = 10;
+var DEFAULT_PAGE_LIMIT = 100;
 function getArtifactsForBranchAndWorkflow(_0, _1) {
   return __async(this, arguments, function* (octokit, {
     owner,
@@ -10383,7 +10383,8 @@ function getArtifactsForBranchAndWorkflow(_0, _1) {
         octokit.rest.actions.listRepoWorkflows,
         {
           owner,
-          repo
+          repo,
+          per_page: 100
         }
       )), more, temp, error; more = !(temp = yield iter.next()).done; more = false) {
         const response = temp.value;
@@ -10417,7 +10418,9 @@ function getArtifactsForBranchAndWorkflow(_0, _1) {
     const workflow_id = repositoryWorkflow.id;
     let currentPage = 0;
     let latestWorkflowRun = null;
-    core.info(`Fetching workflow runs for parameters: owner=${owner}, repo=${repo}, workflow_id=${workflow_id}, branch=${branch}`);
+    core.info(
+      `Fetching workflow runs for parameters: owner=${owner}, repo=${repo}, workflow_id=${workflow_id}, branch=${branch}`
+    );
     try {
       for (var iter2 = __forAwait(octokit.paginate.iterator(
         octokit.rest.actions.listWorkflowRuns,
@@ -10452,10 +10455,10 @@ function getArtifactsForBranchAndWorkflow(_0, _1) {
           } = yield octokit.rest.actions.listWorkflowRunArtifacts({
             owner,
             repo,
-            run_id: workflowRun.id
+            run_id: workflowRun.id,
+            per_page: DEFAULT_PAGE_LIMIT
           });
-          core.info(`Found ${artifacts.length} artifacts for workflow run: ${artifacts.map(({ name }) => name).join(", ")}`);
-          if (!artifacts) {
+          if (!artifacts || !artifacts.length) {
             core.warning(
               `Unable to fetch artifacts for branch: ${branch}, workflow: ${workflow_id}, workflowRunId: ${workflowRun.id}`
             );
@@ -10548,7 +10551,6 @@ function run() {
   return __async(this, null, function* () {
     var _a;
     const { getInput, setFailed } = core2;
-    core2.info("GET ME THE STUFF!");
     try {
       const { repo } = import_github.context;
       const version2 = getInput("version");
@@ -10565,12 +10567,18 @@ function run() {
         core2.debug("Size info already exists, skipping...");
         return;
       }
-      core2.debug(`Fetching artifacts for branch=${branchName} and workflow=${workflowName}`);
+      core2.debug(
+        `Fetching artifacts for branch=${branchName} and workflow=${workflowName}`
+      );
       const artifacts = yield getArtifactsForBranchAndWorkflow(octokit, __spreadProps(__spreadValues({}, repo), {
         artifactName: ARTIFACT_NAME,
         branch: branchName,
         workflowName
       }));
+      if (!artifacts) {
+        core2.debug("No artifacts found, skipping...");
+        return;
+      }
       yield downloadOtherWorkflowArtifact(octokit, __spreadProps(__spreadValues({}, repo), {
         artifactName: ARTIFACT_NAME,
         artifactId: artifacts.artifact.id,
