@@ -18,5 +18,5 @@ inputs:
     required: false
     description: Optionally, define a branch to fetch size limit info from. Defaults to `release/VERSION`.
 runs:
-  using: "node16"
+  using: "node20"
   main: "dist/index.js"
