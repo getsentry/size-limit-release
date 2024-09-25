@@ -31,7 +31,7 @@ jobs:
         run: echo "version=${{ steps.head_version.outputs.match }}" >> $GITHUB_OUTPUT
 
       - name: Update Github Release
-        uses: getsentry/size-limit-release@main
+        uses: getsentry/size-limit-release@v2
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           version: ${{ steps.get_version.outputs.version }}
@@ -39,3 +39,7 @@ jobs:
 ```
 
 Note that this will not do anything if it detects that size limit information has already been added to the release.
+
+The v2 tag of this assumes that you upload your size limit data with v4 of the upload-artifacts action. 
+
+If you are uploading data with v3 of upload-artifacts, use the v1 tag.

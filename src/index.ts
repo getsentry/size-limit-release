@@ -3,11 +3,11 @@ import { promises as fs } from "fs";
 
 import * as core from "@actions/core";
 import { context, getOctokit } from "@actions/github";
-
 import { markdownTable } from "markdown-table";
-
 import SizeLimit from "size-limit-action/src/SizeLimit";
-import download from "github-fetch-workflow-artifact";
+
+import { getArtifactsForBranchAndWorkflow } from "./utils/getArtifactsForBranchAndWorkflow";
+import { downloadOtherWorkflowArtifact } from "./utils/downloadOtherWorkflowArtifact";
 
 const SIZE_LIMIT_HEADING = `## Bundle size 📦 `;
 const ARTIFACT_NAME = "size-limit-action";
@@ -39,13 +39,27 @@ async function run() {
       return;
     }
 
-    await download(octokit, {
+    core.debug(
+      `Fetching artifacts for branch=${branchName} and workflow=${workflowName}`
+    );
+
+    const artifacts = await getArtifactsForBranchAndWorkflow(octokit, {
       ...repo,
       artifactName: ARTIFACT_NAME,
       branch: branchName,
-      downloadPath: __dirname,
-      workflowEvent: "push",
       workflowName,
+    });
+
+    if (!artifacts) {
+      core.debug("No artifacts found, skipping...");
+      return;
+    }
+
+    await downloadOtherWorkflowArtifact(octokit, {
+      ...repo,
+      artifactName: ARTIFACT_NAME,
+      artifactId: artifacts.artifact.id,
+      downloadPath: __dirname,
     });
 
     const sizeLimitResults = JSON.parse(
@@ -57,7 +71,10 @@ async function run() {
       SIZE_LIMIT_HEADING,
       // Note: The size limit result table will add (added) to each result, because we do not compare against anything
       // We just remove these entries, as we don't care about them.
-      markdownTable(limit.formatResults(undefined, sizeLimitResults)).replace(/ \(added\)/gmi, ''),
+      markdownTable(limit.formatResults(undefined, sizeLimitResults)).replace(
+        / \(added\)/gim,
+        ""
+      ),
     ].join("\r\n\r\n");
 
     await octokit.rest.repos.updateRelease({
