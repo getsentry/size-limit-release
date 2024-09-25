@@ -130,6 +130,8 @@ export async function getArtifactsForBranchAndWorkflow(
         run_id: workflowRun.id,
       });
 
+      core.info(`Found ${artifacts.length} artifacts for workflow run: ${artifacts.map(({ name }) => name).join(", ")}`);
+
       if (!artifacts) {
         core.warning(
           `Unable to fetch artifacts for branch: ${branch}, workflow: ${workflow_id}, workflowRunId: ${workflowRun.id}`
