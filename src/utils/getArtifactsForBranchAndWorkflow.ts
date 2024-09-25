@@ -78,6 +78,8 @@ export async function getArtifactsForBranchAndWorkflow(
   let currentPage = 0;
   let latestWorkflowRun = null;
 
+  core.info(`Fetching workflow runs for parameters: owner=${owner}, repo=${repo}, workflow_id=${workflow_id}, branch=${branch}`);
+
   for await (const response of octokit.paginate.iterator(
     octokit.rest.actions.listWorkflowRuns,
     {
