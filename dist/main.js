@@ -3,11 +3,11 @@ var _fs = require('fs');
 
 var _core = require('@actions/core'); var core = _interopRequireWildcard(_core);
 var _github = require('@actions/github');
-
 var _markdowntable = require('markdown-table');
-
 var _SizeLimit = require('size-limit-action/src/SizeLimit'); var _SizeLimit2 = _interopRequireDefault(_SizeLimit);
-var _githubfetchworkflowartifact = require('github-fetch-workflow-artifact'); var _githubfetchworkflowartifact2 = _interopRequireDefault(_githubfetchworkflowartifact);
+
+var _getArtifactsForBranchAndWorkflow = require('./utils/getArtifactsForBranchAndWorkflow');
+var _downloadOtherWorkflowArtifact = require('./utils/downloadOtherWorkflowArtifact');
 
 const SIZE_LIMIT_HEADING = `## Bundle size 📦 `;
 const ARTIFACT_NAME = "size-limit-action";
@@ -39,13 +39,18 @@ async function run() {
       return;
     }
 
-    await _githubfetchworkflowartifact2.default.call(void 0, octokit, {
+    const artifacts = await _getArtifactsForBranchAndWorkflow.getArtifactsForBranchAndWorkflow.call(void 0, octokit, {
       ...repo,
       artifactName: ARTIFACT_NAME,
       branch: branchName,
-      downloadPath: __dirname,
-      workflowEvent: "push",
       workflowName,
+    });
+
+    await _downloadOtherWorkflowArtifact.downloadOtherWorkflowArtifact.call(void 0, octokit, {
+      ...repo,
+      artifactName: ARTIFACT_NAME,
+      artifactId: artifacts.artifact.id,
+      downloadPath: __dirname,
     });
 
     const sizeLimitResults = JSON.parse(
@@ -57,7 +62,10 @@ async function run() {
       SIZE_LIMIT_HEADING,
       // Note: The size limit result table will add (added) to each result, because we do not compare against anything
       // We just remove these entries, as we don't care about them.
-      _markdowntable.markdownTable.call(void 0, limit.formatResults(undefined, sizeLimitResults)).replace(/ \(added\)/gmi, ''),
+      _markdowntable.markdownTable.call(void 0, limit.formatResults(undefined, sizeLimitResults)).replace(
+        / \(added\)/gim,
+        ""
+      ),
     ].join("\r\n\r\n");
 
     await octokit.rest.repos.updateRelease({
