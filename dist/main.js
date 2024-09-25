@@ -16,6 +16,8 @@ const RESULTS_FILE = "size-limit-results.json";
 async function run() {
   const { getInput, setFailed } = core;
 
+  core.info('GET ME THE STUFF!')
+
   try {
     const { repo } = _github.context;
 
